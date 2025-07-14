@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MiniStore - Payment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f8ff;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .payment-container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: auto;
+        }
+
+        .payment-container h2 {
+            color: #333;
+        }
+
+        .total {
+            font-size: 22px;
+            margin: 20px 0;
+            color: #0074d9;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 18px;
+            background-color: #0074d9;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover:enabled {
+            transform: scale(1.05);
+        }
+
+        button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+
+        #password-section {
+            margin-top: 20px;
+            display: none;
+        }
+
+        input[type="password"] {
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        #thank-you {
+            margin-top: 40px;
+            font-size: 22px;
+            color: #0074d9;
+            font-weight: bold;
+            display: none;
+        }
+
+        #error-message {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #fdf6f0; /* Light Pantone-like pastel */
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <h2>Confirm Your Payment</h2>
+        <div class="total">Total Amount: ₹<span id="total-price">0.00</span></div>
+        
+        <button id="pay-btn">Pay</button>
+
+        <div id="password-section">
+            <input type="password" id="password-input" placeholder="Enter your password">
+            <button id="confirm-btn" disabled>Confirm Payment</button>
+            <div id="error-message"></div>
+        </div>
+
+        <div id="thank-you">🎉 Payment Confirmed!<br><br>Thank you for your purchase!</div>
+    </div>
+
+    <script>
+        // ✅ Set the correct password here
+        const correctPassword = "ministore123";
+
+        // Load and display total amount
+        const total = localStorage.getItem("paymentTotal");
+        document.getElementById("total-price").innerText = total;
+
+        // Show password section on Pay
+        document.getElementById("pay-btn").addEventListener("click", () => {
+            document.getElementById("pay-btn").style.display = "none";
+            document.getElementById("password-section").style.display = "block";
+        });
+
+        // Enable confirm button only when password is typed
+        document.getElementById("password-input").addEventListener("input", function () {
+            const confirmBtn = document.getElementById("confirm-btn");
+            confirmBtn.disabled = this.value.trim().length === 0;
+            document.getElementById("error-message").innerText = "";
+        });
+
+        // Confirm payment click
+        document.getElementById("confirm-btn").addEventListener("click", () => {
+            const enteredPassword = document.getElementById("password-input").value;
+            const errorMsg = document.getElementById("error-message");
+
+            if (enteredPassword === correctPassword) {
+                document.getElementById("confirm-btn").disabled = true;
+                document.getElementById("confirm-btn").innerText = "Payment Confirmed";
+                document.getElementById("thank-you").style.display = "block";
+                errorMsg.innerText = "";
+                localStorage.removeItem("paymentTotal");
+            } else {
+                errorMsg.innerText = "❌ Wrong password!";
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>MiniStore</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background: #f5f5f5;
+                margin: 0;
+                padding: 0;
+                }
+        
+            .container {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 32px;
+                margin: 50px auto;
+                max-width: 900px;
+                }
+        
+            .item {
+                background: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+                cursor: pointer;
+                transition: transform 0.2s, box-shadow 0.2s;
+                text-align: center;
+                width: 220px;
+                }
+        
+            .item:hover {
+                transform: translateY(-6px) scale(1.03);
+                box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+                }
+        
+            .item img {
+                width: 180px;
+                height: 180px;
+                object-fit: cover;
+                border-radius: 8px;
+                margin-bottom: 12px;
+                }
+        
+            .desc {
+                font-size: 1.15em;
+                color: #333;
+                margin-top: 5px;
+                border-bottom: 2px solid transparent;
+                display: inline-block;
+                transition: border-color 0.2s;
+                }
+        
+            .item:hover .desc {
+                border-bottom: 2px solid #0074d9;
+                }
+        
+            .back-link {
+                display: inline-block;
+                margin: 24px;
+                color: #0074d9;
+                text-decoration: none;
+                font-size: 1em;
+                transition: text-decoration 0.2s;
+                }
+            
+            .back-link:hover {
+                text-decoration: underline;
+                }
+
+            form {
+                background-color: #fff;
+                padding: 25px;
+                margin: 40px auto;
+                border-radius: 12px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                max-width: 450px;
+                font-family: Arial, sans-serif;
+                }
+
+            form h2 {
+                text-align: center;
+                color: #333;
+                margin-bottom: 20px;
+                }
+
+            label {
+                display: block;
+                margin-bottom: 6px;
+                color: #444;
+                font-weight: bold;
+                }
+
+            input[type="text"],
+            input[type="number"],
+            select,
+            input[type="file"] {
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 18px;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                font-size: 15px;
+                transition: border-color 0.3s;
+                }
+
+            input[type="text"]:focus,
+            input[type="number"]:focus,
+            select:focus,
+            input[type="file"]:focus {
+                border-color: #0074d9;
+                outline: none;
+                }
+
+            button[type="submit"] {
+                background-color: #0074d9;
+                color: #fff;
+                border: none;
+                padding: 12px 20px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                width: 100%;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+                }
+
+            button[type="submit"]:hover {
+                background-color: #005fa3;
+                transform: translateY(-2px);
+                }
+
+            /* Optional: Add a horizontal divider between forms */
+            hr {
+                border: none;
+                height: 1px;
+                background-color: #ccc;
+                margin: 30px auto;
+                max-width: 500px;
+                }
+
+            body {
+                font-family: Arial, sans-serif;
+                background: #fdf6f0; /* Light Pantone-like pastel */
+                margin: 0;
+                padding: 0;
+                }
+
+            .store-header {
+                background-color: maroon;
+                color: white;
+                text-align: center;
+                font-size: 28px;
+                padding: 20px 0;
+                font-weight: bold;
+                letter-spacing: 2px;
+                }
+        </style>
+    </head>
+    <body>
+        <header class="store-header">
+            MINI STORE
+        </header>
+
+        <div class="container">
+            <div class="item" onclick="redirectToProducts(1)">
+                <img src="images/InstrumentBox1.jpg" alt="Instrument Box">
+                <div class="desc">Instrument Box</div>
+            </div>
+            <div class="item" onclick="redirectToProducts(2)">
+                <img src="images/LunchBox1.jpg" alt="Lunch Box">
+                <div class="desc">Lunch Box</div>
+            </div>
+        </div>
+
+        <!-- Add New Product Form -->
+        <h2 style="text-align:center;">Add New Product</h2>
+        <form id="uploadForm" enctype="multipart/form-data" style="max-width: 400px; margin: auto;">
+            <label>Product Name:</label><br>
+            <input type="text" name="P_Name" required><br><br>
+
+            <label>Price (₹):</label><br>
+            <input type="number" name="Price" required><br><br>
+
+            <label>Product Type:</label><br>
+            <select name="PT_ID" required>
+                <option value="1">Instrument Box</option>
+                <option value="2">Lunch Box</option>
+            </select><br><br>
+
+            <label>Product Image:</label><br>
+            <input type="file" name="image" accept="image/*" required><br><br>
+
+            <button type="submit">Upload</button>
+        </form>
+
+        <!-- Delete Product Form -->
+            <h2 style="text-align:center;">Delete Product</h2>
+            <form id="deleteForm" style="max-width: 400px; margin: auto;">
+                <label>Product Name:</label><br>
+                <input type="text" name="P_Name" required><br><br>
+                
+                <label>Product Type:</label><br>
+                <select name="PT_ID" required>
+                    <option value="1">Instrument Box</option>
+                    <option value="2">Lunch Box</option>
+                </select><br><br>
+
+                <button type="submit">Delete Product</button>
+            </form>
+
+            <!-- Update Product Form -->
+            <h2 style="text-align:center;">Update Product</h2>
+            <form id="updateForm" style="max-width: 400px; margin: auto;">
+                <label>Product Name to Update:</label><br>
+                <input type="text" name="old_P_Name" required><br><br>
+
+                <label>Current Product Type:</label><br>
+                <select name="PT_ID" required>
+                    <option value="1">Instrument Box</option>
+                    <option value="2">Lunch Box</option>
+                </select><br><br>
+
+                <label>New Product Name (optional):</label><br>
+                <input type="text" name="new_P_Name"><br><br>
+
+                <label>New Price (optional):</label><br>
+                <input type="number" name="new_Price"><br><br>
+
+                <label>New Product Type (optional):</label><br>
+                <select name="new_PT_ID">
+                    <option value="">--No Change--</option>
+                    <option value="1">Instrument Box</option>
+                    <option value="2">Lunch Box</option>
+                </select><br><br>
+
+                <button type="submit">Update Product</button>
+            </form>
+
+        <script>
+            function redirectToProducts(typeId) {
+                // Redirect to products.html with product type as query param
+                window.location.href = `products.html?typeId=${typeId}`;
+            }
+            //Upload product
+            document.getElementById("uploadForm").addEventListener("submit", async function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(result.message || "Product uploaded successfully!");
+
+                    // ✅ Redirect to correct product type
+                    window.location.href = `products.html?typeId=${formData.get('PT_ID')}`;
+                } else {
+                    alert("❌ Upload failed: " + result.error);
+                }
+            });
+
+
+            // Delete product
+            document.getElementById("deleteForm").addEventListener("submit", async function (e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const P_Name = formData.get("P_Name");
+
+                const response = await fetch(`/api/delete`, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ P_Name })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message || "Product deleted successfully!");
+
+                    // ✅ Redirect to correct product type
+                    window.location.href = `products.html?typeId=${formData.get('PT_ID')}`;
+                } else {
+                    alert("❌ Deletion failed: " + result.error);
+                }
+            });
+
+            // Update product
+            document.getElementById("updateForm").addEventListener("submit", async function (e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+
+                const data = {
+                    old_P_Name: formData.get("old_P_Name"),
+                    new_P_Name: formData.get("new_P_Name"),
+                    new_Price: formData.get("new_Price"),
+                    new_PT_ID: formData.get("new_PT_ID")
+                };
+
+                const response = await fetch(`/api/update`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message || "Product updated successfully!");
+
+                    // ✅ Redirect to correct product type
+                    window.location.href = `products.html?typeId=${formData.get('PT_ID')}`;
+                } else {
+                    alert("❌ Update failed: " + result.error);
+                }
+            });
+        </script>
+    </body>
+</html>

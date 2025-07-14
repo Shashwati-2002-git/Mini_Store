@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>MiniStore Products</title>
+        <style>
+            .item img {
+                height: 300px;
+                width: 300px;
+                object-fit: cover;
+            }
+
+            .item {
+                display: inline-block;
+                margin: 10px;
+                text-align: center;
+                background-color: #fff;
+                padding: 12px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+
+            .desc {
+                margin-top: 5px;
+                font-size: 18px;
+            }
+
+            .back-link {
+                display: inline-block;
+                margin: 20px;
+                padding: 10px 16px;
+                background-color: #0074d9;
+                color: #fff;
+                text-decoration: none;
+                font-size: 16px;
+                border-radius: 6px;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            }
+
+            .back-link:hover {
+                background-color: #005fa3;
+                transform: translateX(-3px);
+                text-decoration: none;
+            }
+
+            select {
+                padding: 6px 10px;
+                font-size: 16px;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+            }
+
+            #cart-summary {
+                margin: 40px auto;
+                text-align: center;
+                font-size: 18px;
+                background-color: #f0f8ff;
+                border-radius: 10px;
+                padding: 20px;
+                max-width: 400px;
+            }
+
+            #cart-summary button {
+                padding: 10px 20px;
+                font-size: 16px;
+                background-color: #28a745;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+            #cart-summary button:hover {
+                background-color: #218838;
+            }
+
+            button:hover,
+            button:focus {
+                transform: scale(1.08); /* Zoom in slightly */
+                transition: transform 0.2s ease-in-out;
+            }
+
+            button:active {
+                transform: scale(0.98); /* Zoom out slightly on click */
+            }
+
+            body {
+                font-family: Arial, sans-serif;
+                background: #fdf6f0; /* Light Pantone-like pastel */
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <a href="index.html" class="back-link">← Back</a>
+
+        <div style="margin: 20px;">
+            <label for="filter">Filter: </label>
+            <select id="filter" onchange="applyFilterSort()">
+                <option value="">All</option>
+                <option value="300">Under Rs. 300</option>
+                <option value="500">Under Rs. 500</option>
+            </select>
+
+            <label for="sort" style="margin-left: 20px;">Sort by Price: </label>
+            <select id="sort" onchange="applyFilterSort()">
+                <option value="">None</option>
+                <option value="asc">Increasing Price</option>
+                <option value="desc">Decreasing Price</option>
+            </select>
+        </div>
+
+        <div class="container" id="product-list">
+            <!-- Products will be loaded here -->
+        </div>
+
+        <!-- Cart Summary at the bottom -->
+        <div id="cart-summary">
+            <p><strong>Total Items:</strong> <span id="cart-count">0</span></p>
+            <p><strong>Total Price:</strong> ₹<span id="cart-total">0.00</span></p>
+            <button onclick="placeOrder()">Place Order</button>
+        </div>
+
+        <script>
+            let cart = [];
+
+            function getTypeId() {
+                const params = new URLSearchParams(window.location.search);
+                return params.get('typeId');
+            }
+
+            async function loadProducts(filter = "", sort = "") {
+                const typeId = getTypeId();
+                let url = `/api/products?typeId=${typeId}`;
+
+                if (filter) url += `&filter=${filter}`;
+                if (sort) url += `&sort=${sort}`;
+
+                const res = await fetch(url);
+                const products = await res.json();
+                const productList = document.getElementById("product-list");
+                productList.innerHTML = "";
+
+                if (products.length === 0) {
+                    productList.innerHTML = "<div class='desc'>No products found.</div>";
+                    return;
+                }
+
+                products.forEach(product => {
+                    const div = document.createElement("div");
+                    div.className = "item";
+                    div.innerHTML = `
+                    <img src="/images/${product.ImagePath}" alt="${product.P_Name}">
+                    <div class="desc">${product.P_Name}<br>₹${product.Price}</div>
+                    <button onclick='addToCart(${JSON.stringify(product)})' style="margin-top: 8px; margin-bottom: 5px; padding: 6px 12px; background-color: #0074d9; color: white; border: none; border-radius: 4px; transition: transform 0.2s;">Add to Cart</button>
+                    <br>
+                    <button onclick='buyNow(${JSON.stringify(product)})' style="padding: 6px 12px; background-color: #28a745; color: white; border: none; border-radius: 4px; transition: transform 0.2s;">Buy Now</button>
+                `;
+
+                    productList.appendChild(div);
+                });
+            }
+
+            function addToCart(product) {
+                cart.push(product);
+                updateCart();
+            }
+
+            function buyNow(product) {
+                // Store only this product's price in localStorage for payment page
+                const total = parseFloat(product.Price).toFixed(2);
+                localStorage.setItem("paymentTotal", total);
+
+                // Optional: also store product name if needed later
+                localStorage.setItem("paymentProductName", product.P_Name);
+
+                // Redirect to payment.html
+                window.location.href = "payment.html";
+            }
+
+            function updateCart() {
+                const cartCount = document.getElementById("cart-count");
+                const cartTotal = document.getElementById("cart-total");
+
+                cartCount.innerText = cart.length;
+                const total = cart.reduce((sum, item) => sum + parseFloat(item.Price), 0);
+                cartTotal.innerText = total.toFixed(2);
+            }
+
+            function placeOrder() {
+                if (cart.length === 0) {
+                    alert("🛒 Your cart is empty!");
+                    return;
+                }
+
+                const total = cart.reduce((sum, item) => sum + parseFloat(item.Price), 0).toFixed(2);
+
+                // Store total in localStorage (for transfer to payment.html)
+                localStorage.setItem("paymentTotal", total);
+
+                // Redirect to payment page
+                window.location.href = "payment.html";
+            }
+
+            function applyFilterSort() {
+                const filter = document.getElementById("filter").value;
+                const sort = document.getElementById("sort").value;
+                loadProducts(filter, sort);
+            }
+
+            // Load products on page load
+            loadProducts();
+        </script>
+    </body>
+</html>
